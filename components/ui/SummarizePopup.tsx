@@ -23,14 +23,17 @@ export default function SummarizePopup({
 		setTopComments([]);
 
 		try {
-			const res = await fetch("http://127.0.0.1:5000/summarize", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					post_text: postText,
-					comments_text: comments.map((c) => c.content).join("\n"),
-				}),
-			});
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/summarize`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						post_text: postText,
+						comments_text: comments.map((c) => c.content).join("\n"),
+					}),
+				}
+			);
 
 			const data = await res.json();
 			setSummary(data.summary || "No summary returned.");
