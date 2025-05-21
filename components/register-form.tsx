@@ -32,6 +32,7 @@ export default function RegisterForm() {
 		"React",
 	];
 	const [skills, setSkills] = useState<string[]>([]);
+	const [customSkill, setCustomSkill] = useState("");
 
 	const handleSkillToggle = (skill: string) => {
 		setSkills((prev) =>
@@ -121,13 +122,16 @@ export default function RegisterForm() {
 
 					<div className="space-y-2">
 						<Label>Select Your Skills</Label>
-						<div className="flex flex-wrap gap-2">
+
+						{/* Predefined skill buttons */}
+						<div className="flex flex-wrap items-center gap-2">
+							{/* Predefined skill buttons */}
 							{skillOptions.map((skill) => (
 								<button
 									type="button"
 									key={skill}
 									onClick={() => handleSkillToggle(skill)}
-									className={`px-3 py-1 rounded-full border text-sm transition-all ${
+									className={`px-3 py-1 text-sm rounded-full border transition ${
 										skills.includes(skill)
 											? "bg-rv-accent text-black shadow-md"
 											: "bg-[#1a1f2b] text-rv-accent border-rv-border"
@@ -136,6 +140,44 @@ export default function RegisterForm() {
 									{skill}
 								</button>
 							))}
+
+							{/* Custom-added skills (not from predefined) */}
+							{skills
+								.filter((skill) => !skillOptions.includes(skill))
+								.map((skill) => (
+									<button
+										type="button"
+										key={skill}
+										onClick={() => handleSkillToggle(skill)}
+										className="px-3 py-1 text-sm rounded-full border bg-rv-accent text-black shadow-md transition"
+									>
+										{skill}
+									</button>
+								))}
+
+							{/* Custom tag input + add */}
+							<div className="flex items-center gap-2">
+								<input
+									type="text"
+									placeholder="Add skill"
+									value={customSkill}
+									onChange={(e) => setCustomSkill(e.target.value)}
+									className="px-3 py-1 text-sm w-[110px] rounded-full bg-[#1a1f2b] text-rv-text border border-rv-border placeholder:text-rv-textMuted focus:outline-none"
+								/>
+								<button
+									type="button"
+									onClick={() => {
+										const skill = customSkill.trim();
+										if (skill && !skills.includes(skill)) {
+											setSkills([...skills, skill]);
+										}
+										setCustomSkill("");
+									}}
+									className="text-sm px-3 py-1 rounded-full bg-rv-accent text-black font-medium hover:bg-rv-accentHover transition"
+								>
+									Add
+								</button>
+							</div>
 						</div>
 					</div>
 
