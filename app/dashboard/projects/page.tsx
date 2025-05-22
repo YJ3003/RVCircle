@@ -14,6 +14,10 @@ export default function DoubtsPage() {
 	const [loading, setLoading] = useState(true);
 	const [message, setMessage] = useState("");
 	const [customTag, setCustomTag] = useState("");
+	const [commentLoading, setCommentLoading] = useState<{
+		[key: string]: boolean;
+	}>({});
+	const [isPostingProject, setIsPostingProject] = useState(false);
 
 	const tagOptions = ["Python", "Java", "C++", "WebDev", "Machine Learning"];
 
@@ -46,9 +50,12 @@ export default function DoubtsPage() {
 			return;
 		}
 
+		setIsPostingProject(true); // 🌀
+		setMessage("Posted ✅");
+
 		const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-		const res = await fetch("/api/projects", {
+		await fetch("/api/projects", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
@@ -58,20 +65,15 @@ export default function DoubtsPage() {
 				isAnonymous,
 				name: isAnonymous ? null : user.name,
 				userId: user.email,
-				branch: isAnonymous ? null : user.branch, // ✅
+				branch: isAnonymous ? null : user.branch,
 			}),
 		});
 
-		if (res.ok) {
-			setMessage("Posted ✅");
-			setDoubt("");
-			setTags([]);
-			setIsAnonymous(false);
-			fetchDiscussions();
-		} else {
-			const data = await res.json();
-			setMessage(data.message || "Something went wrong");
-		}
+		setDoubt("");
+		setTags([]);
+		setIsAnonymous(false);
+		setIsPostingProject(false); // ✅
+		fetchDiscussions();
 	};
 
 	const handleDelete = async (id: string) => {
@@ -176,9 +178,14 @@ export default function DoubtsPage() {
 
 					<button
 						onClick={handleSubmit}
-						className="mt-4 bg-rv-accent text-black px-4 py-2 rounded hover:bg-rv-accentHover font-semibold transition"
+						disabled={isPostingProject}
+						className={`mt-4 px-4 py-2 rounded font-semibold transition ${
+							isPostingProject
+								? "bg-gray-600 cursor-not-allowed text-white"
+								: "bg-rv-accent text-black hover:bg-rv-accentHover"
+						}`}
 					>
-						Post Doubt
+						{isPostingProject ? "Posting..." : "Post Doubt"}
 					</button>
 
 					{message && <p className="mt-2 text-sm text-red-400">{message}</p>}
@@ -297,66 +304,27 @@ export default function DoubtsPage() {
 											setFeed(updatedFeed);
 										}}
 										onKeyDown={async (e) => {
-											if (e.key === "Enter" && !e.shiftKey) {
+											if (
+												e.key === "Enter" &&
+												!e.shiftKey &&
+												!commentLoading[item._id]
+											) {
 												e.preventDefault();
 												const user = JSON.parse(
 													localStorage.getItem("user") || "{}"
 												);
 												if (!item.newComment || !item.newComment.trim()) return;
 
-												const res = await fetch("/api/projects", {
-													method: "PATCH",
-													headers: { "Content-Type": "application/json" },
-													body: JSON.stringify({
-														id: item._id,
-														content: item.newComment.trim(),
-														name: user.name,
-														userId: user.email,
-														branch: user.branch, // ✅ now this will reach the backend
-													}),
-												});
-												if (res.ok) {
-													const newComment = {
-														content: item.newComment.trim(),
-														name: user.name,
-														branch: user.branch, // ✅ include branch so UI shows it immediately
-													};
+												setCommentLoading((prev) => ({
+													...prev,
+													[item._id]: true,
+												}));
 
-													const updatedFeed = [...feed];
-													updatedFeed[idx].comments = [
-														...(item.comments || []),
-														newComment,
-													];
-													updatedFeed[idx].newComment = "";
-													setFeed(updatedFeed);
-												}
-											}
-										}}
-									/>
-
-									<button
-										onClick={async () => {
-											const user = JSON.parse(
-												localStorage.getItem("user") || "{}"
-											);
-											if (!item.newComment || !item.newComment.trim()) return;
-
-											const res = await fetch("/api/projects", {
-												method: "PATCH",
-												headers: { "Content-Type": "application/json" },
-												body: JSON.stringify({
-													id: item._id,
-													content: item.newComment.trim(),
-													name: user.name,
-													userId: user.email,
-													branch: user.branch, // ✅ now this will reach the backend
-												}),
-											});
-											if (res.ok) {
 												const newComment = {
 													content: item.newComment.trim(),
 													name: user.name,
-													branch: user.branch, // ✅ include branch so UI shows it immediately
+													branch: user.branch,
+													userId: user.email,
 												};
 
 												const updatedFeed = [...feed];
@@ -366,11 +334,79 @@ export default function DoubtsPage() {
 												];
 												updatedFeed[idx].newComment = "";
 												setFeed(updatedFeed);
+
+												await fetch("/api/projects", {
+													method: "PATCH",
+													headers: { "Content-Type": "application/json" },
+													body: JSON.stringify({
+														id: item._id,
+														content: newComment.content,
+														name: user.name,
+														userId: user.email,
+														branch: user.branch,
+													}),
+												});
+
+												setCommentLoading((prev) => ({
+													...prev,
+													[item._id]: false,
+												}));
 											}
 										}}
-										className="bg-rv-accent hover:bg-rv-accentHover text-black px-3 py-1 rounded text-sm transition"
+									/>
+
+									<button
+										disabled={commentLoading[item._id]}
+										onClick={async () => {
+											const user = JSON.parse(
+												localStorage.getItem("user") || "{}"
+											);
+											if (!item.newComment || !item.newComment.trim()) return;
+
+											setCommentLoading((prev) => ({
+												...prev,
+												[item._id]: true,
+											}));
+
+											const newComment = {
+												content: item.newComment.trim(),
+												name: user.name,
+												branch: user.branch,
+												userId: user.email,
+											};
+
+											const updatedFeed = [...feed];
+											updatedFeed[idx].comments = [
+												...(item.comments || []),
+												newComment,
+											];
+											updatedFeed[idx].newComment = "";
+											setFeed(updatedFeed);
+
+											await fetch("/api/projects", {
+												method: "PATCH",
+												headers: { "Content-Type": "application/json" },
+												body: JSON.stringify({
+													id: item._id,
+													content: newComment.content,
+													name: user.name,
+													userId: user.email,
+													branch: user.branch,
+												}),
+											});
+
+											setCommentLoading((prev) => ({
+												...prev,
+												[item._id]: false,
+											}));
+										}}
+										className={`px-3 py-1 rounded text-sm transition ${
+											commentLoading[item._id]
+												? "bg-gray-600 cursor-not-allowed text-white"
+												: "bg-rv-accent hover:bg-rv-accentHover text-black"
+										}`}
 									>
-										Post
+										{commentLoading[item._id] ? "Posting..." : "Post"}
 									</button>
 								</div>
 							</div>
