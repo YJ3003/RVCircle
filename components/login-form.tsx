@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useChatStore } from "@/lib/chatStore"; // ✅ Add this line
 
 export default function LoginForm() {
 	const [email, setEmail] = useState("");
@@ -22,6 +23,7 @@ export default function LoginForm() {
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
+	const resetChat = useChatStore((state) => state.resetChat); // ✅ Add this line inside the component
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -37,6 +39,7 @@ export default function LoginForm() {
 			const data = await response.json();
 			if (!response.ok) throw new Error(data.message || "Login failed");
 			localStorage.setItem("user", JSON.stringify(data.user));
+			resetChat(); // ✅ Clears previous messages
 			router.push("/dashboard");
 		} catch (err: any) {
 			setError(err.message || "Something went wrong");
