@@ -8,7 +8,7 @@ const collectionName = "users";
 
 export async function POST(request: Request) {
 	try {
-		const { name, email, password, year, skills, hobbies } =
+		const { name, email, password, year, branch, skills, hobbies, linkedin } =
 			await request.json();
 
 		if (!email || !password) {
@@ -51,8 +51,10 @@ export async function POST(request: Request) {
 			email,
 			password: hashedPassword,
 			year,
+			branch,
 			skills,
 			hobbies,
+			linkedin,
 			createdAt: new Date(),
 		});
 

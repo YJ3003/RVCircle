@@ -66,6 +66,8 @@ export async function POST(request: Request) {
 			year: user.year || "",
 			skills: user.skills || [],
 			hobbies: user.hobbies || "",
+			branch: user.branch || "",
+			linkedin: user.linkedin || "",
 		};
 
 		await client.close();

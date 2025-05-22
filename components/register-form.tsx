@@ -22,15 +22,10 @@ export default function RegisterForm() {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [year, setYear] = useState("");
+	const [linkedin, setLinkedin] = useState("");
+	const [branch, setBranch] = useState("");
 	const [hobbies, setHobbies] = useState("");
-	const skillOptions = [
-		"Python",
-		"C++",
-		"Web Dev",
-		"Machine Learning",
-		"Java",
-		"React",
-	];
+	const skillOptions = ["Python", "C++", "Web Dev", "Java"];
 	const [skills, setSkills] = useState<string[]>([]);
 	const [customSkill, setCustomSkill] = useState("");
 
@@ -61,7 +56,16 @@ export default function RegisterForm() {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ name, email, password, year, skills, hobbies }),
+				body: JSON.stringify({
+					name,
+					email,
+					password,
+					year,
+					branch,
+					skills,
+					hobbies,
+					linkedin,
+				}),
 			});
 
 			const data = await response.json();
@@ -70,6 +74,10 @@ export default function RegisterForm() {
 				throw new Error(data.message || "Registration failed");
 			}
 
+			localStorage.setItem(
+				"user",
+				JSON.stringify({ name, email, year, branch, skills, hobbies, linkedin })
+			);
 			router.push("/");
 		} catch (err: any) {
 			setError(err.message || "Something went wrong");
@@ -117,6 +125,52 @@ export default function RegisterForm() {
 							<option value="2nd Year">2nd Year</option>
 							<option value="3rd Year">3rd Year</option>
 							<option value="4th Year">4th Year</option>
+						</select>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="branch">Branch</Label>
+						<select
+							id="branch"
+							value={branch}
+							onChange={(e) => setBranch(e.target.value)}
+							required
+							className="w-full px-3 py-2 rounded-lg bg-[#1a1f2b] text-rv-text border border-rv-border focus:outline-none focus:ring-2 focus:ring-rv-accent"
+						>
+							<option value="" disabled>
+								Select your branch
+							</option>
+							<option value="CSE">
+								Computer Science and Engineering (CSE)
+							</option>
+							<option value="ISE">
+								Information Science and Engineering (ISE)
+							</option>
+							<option value="ECE">
+								Electronics and Communication Engineering (ECE)
+							</option>
+							<option value="MECH">Mechanical Engineering</option>
+							<option value="CIVIL">Civil Engineering</option>
+							<option value="EEE">
+								Electrical and Electronics Engineering (EEE)
+							</option>
+							<option value="BIO">Biotechnology</option>
+							<option value="CHEM">Chemical Engineering</option>
+							<option value="AERO">Aerospace Engineering</option>
+							<option value="AI">
+								Artificial Intelligence and Machine Learning (AI & ML)
+							</option>
+							<option value="IEM">
+								Industrial Engineering and Management (IEM)
+							</option>
+							<option value="ETC">
+								Electronics and Telecommunication Engineering (ETC)
+							</option>
+							<option value="DS">Data Science</option>
+							<option value="CYBER">Cyber Security</option>
+							<option value="EIE">
+								Electronics and Instrumentation Engineering
+							</option>
 						</select>
 					</div>
 
@@ -202,6 +256,18 @@ export default function RegisterForm() {
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							required
+							className="bg-[#1a1f2b] text-rv-text placeholder:text-rv-textMuted border border-rv-border focus:ring-2 focus:ring-rv-accent"
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="linkedin">LinkedIn URL</Label>
+						<Input
+							id="linkedin"
+							type="url"
+							placeholder="https://www.linkedin.com/in/yourname"
+							value={linkedin}
+							onChange={(e) => setLinkedin(e.target.value)}
 							className="bg-[#1a1f2b] text-rv-text placeholder:text-rv-textMuted border border-rv-border focus:ring-2 focus:ring-rv-accent"
 						/>
 					</div>

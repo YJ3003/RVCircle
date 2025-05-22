@@ -76,7 +76,7 @@ export async function DELETE(req: Request) {
 
 // PATCH: Add comment to a project discussion
 export async function PATCH(req: Request) {
-	const { id, name, content, userId } = await req.json();
+	const { id, name, content, userId, branch } = await req.json();
 
 	if (!id || !content || !userId) {
 		return NextResponse.json({ message: "Missing fields" }, { status: 400 });
@@ -92,6 +92,7 @@ export async function PATCH(req: Request) {
 					_id: new ObjectId(),
 					name: name || "Anonymous",
 					userId,
+					branch, // ✅ added
 					content,
 					postedAt: new Date(),
 				},

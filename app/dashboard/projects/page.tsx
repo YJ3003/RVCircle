@@ -27,6 +27,10 @@ export default function DoubtsPage() {
 	useEffect(() => {
 		const user = JSON.parse(localStorage.getItem("user") || "{}");
 		if (user.year) setYear(user.year);
+
+		// 🔁 force localStorage refresh (optional)
+		localStorage.setItem("user", JSON.stringify(user));
+
 		fetchDiscussions();
 	}, []);
 
@@ -54,6 +58,7 @@ export default function DoubtsPage() {
 				isAnonymous,
 				name: isAnonymous ? null : user.name,
 				userId: user.email,
+				branch: isAnonymous ? null : user.branch, // ✅
 			}),
 		});
 
@@ -200,7 +205,11 @@ export default function DoubtsPage() {
 								/>
 
 								<div className="text-sm text-rv-textMuted mt-2 flex justify-between items-center">
-									<span>{item.name || "Anonymous"}</span>
+									<span>
+										{item.name || "Anonymous"}
+										{item.branch && ` (${item.branch})`}
+									</span>
+
 									<div className="flex items-center gap-3">
 										<span>{item.year}</span>
 										{item.userId ===
@@ -239,7 +248,10 @@ export default function DoubtsPage() {
 										>
 											<p>{comment.content}</p>
 											<div className="text-xs text-rv-textMuted mt-1 flex justify-between items-center">
-												<span>— {comment.name || "Anonymous"}</span>
+												<span>
+													— {comment.name || "Anonymous"}
+													{comment.branch && ` (${comment.branch})`}
+												</span>
 
 												{comment.userId ===
 													JSON.parse(localStorage.getItem("user") || "{}")
@@ -300,13 +312,16 @@ export default function DoubtsPage() {
 														content: item.newComment.trim(),
 														name: user.name,
 														userId: user.email,
+														branch: user.branch, // ✅ now this will reach the backend
 													}),
 												});
 												if (res.ok) {
 													const newComment = {
 														content: item.newComment.trim(),
 														name: user.name,
+														branch: user.branch, // ✅ include branch so UI shows it immediately
 													};
+
 													const updatedFeed = [...feed];
 													updatedFeed[idx].comments = [
 														...(item.comments || []),
@@ -334,13 +349,16 @@ export default function DoubtsPage() {
 													content: item.newComment.trim(),
 													name: user.name,
 													userId: user.email,
+													branch: user.branch, // ✅ now this will reach the backend
 												}),
 											});
 											if (res.ok) {
 												const newComment = {
-													content: item.newComment,
+													content: item.newComment.trim(),
 													name: user.name,
+													branch: user.branch, // ✅ include branch so UI shows it immediately
 												};
+
 												const updatedFeed = [...feed];
 												updatedFeed[idx].comments = [
 													...(item.comments || []),
