@@ -85,7 +85,7 @@ export default function LoginForm() {
 					</div>
 
 					<div className="space-y-2">
-						<div className="flex items-center justify-between">
+						{/* <div className="flex items-center justify-between">
 							<Label htmlFor="password">Password</Label>
 							<Link
 								href="/forgot-password"
@@ -93,7 +93,7 @@ export default function LoginForm() {
 							>
 								Forgot password?
 							</Link>
-						</div>
+						</div> */}
 						<Input
 							id="password"
 							type="password"
