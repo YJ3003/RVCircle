@@ -137,7 +137,13 @@ We'd love your help making RVCircle even better! Here's how you can contribute:
 
 ## 👨‍💻 Built By
 
-**[YJ3003](https://github.com/YJ3003)** - *Full-stack development, AI integration, and overall architecture*
+**[YJ3003](https://github.com/YJ3003)** - *Lead developer and technical implementation*
+
+**Team Members:**
+- **[zeenat-khan28](https://github.com/zeenat-khan28)**
+- **[yashu-wini](https://github.com/yashu-wini)**
+
+*Built as part of a 3-person team project at RVCE*
 
 ---
 
