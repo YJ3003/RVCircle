@@ -135,12 +135,6 @@ We'd love your help making RVCircle even better! Here's how you can contribute:
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 👨‍💻 Built By
 
 **[YJ3003](https://github.com/YJ3003)** - *Full-stack development, AI integration, and overall architecture*
